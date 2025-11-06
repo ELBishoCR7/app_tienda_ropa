@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, field_validator, validator
 from sqlalchemy.orm import Session # Para interactuar con la DB
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -162,7 +162,7 @@ class ProfileUpdateSchema(BaseModel):
             raise ValueError("Código postal inválido")
         return v.strip()
 
-    @validator("telefono")
+    @field_validator("telefono")
     def validar_telefono(cls, v):
         if v is None:
             return v
@@ -171,7 +171,7 @@ class ProfileUpdateSchema(BaseModel):
             raise ValueError("Teléfono inválido")
         return v.strip()
 
-    @validator("pais", "ciudad", "estado", "direccion")
+    @field_validator("pais", "ciudad", "estado", "direccion")
     def strip_strings(cls, v):
         if v is None:
             return v

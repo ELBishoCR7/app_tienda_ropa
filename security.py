@@ -3,17 +3,16 @@ from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, security, status
 from fastapi.security import OAuth2PasswordBearer
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # --- Configuración de Hashing (ya lo teníamos) ---
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# --- ¡NUEVO! Configuración de JWT ---
-# IMPORTANTE: ¡Genera tu propia llave secreta!
-# Puedes usar un generador de contraseñas online para esto.
-# Debe ser una cadena larga y aleatoria.
-SECRET_KEY = "gnq<`7*M9{4oZ&2H!v$uL?8zWqXc>e@Yp3JrF)h%N1bO6S+gV0yI|jE#R]t;A" 
-ALGORITHM = "HS256"
-URLKEY = "mysql+mysqlconnector://root:Saul25591@127.0.0.1:3306/tienda_db"
+# --- Configuración de JWT (Tokens) ---
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # El token será válido por 30 minutos
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -39,7 +38,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire})
     
     # "Firma" el token con nuestra llave secreta
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), algorithm=os.getenv("ALGORITHM"))
     return encoded_jwt
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
@@ -51,7 +50,7 @@ def verify_token_payload(token: str) -> dict:
     """
     try:
         # Intenta decodificar el token usando nuestra llave secreta
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
         
         # Extraemos el email (que guardamos como 'sub')
         user_email: str | None = payload.get("sub")

@@ -1,11 +1,19 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-# --- ¡IMPORTANTE! ACTUALIZA ESTA LÍNEA ---
-# Formato: "mysql+mysqlconnector://[USUARIO]:[PASSWORD]@[HOST]:[PUERTO]/[NOMBRE_DB]"
-DATABASE_URL = "mysql+mysqlconnector://root:Saul25591@127.0.0.1:3306/tienda_db"
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
+
+# --- LEE LA URL DIRECTAMENTE DEL .ENV ---
+DATABASE_URL = os.getenv("DATABASE_URL")
 # ----------------------------------------
+
+# Si la URL no se encuentra, lanza un error para evitar problemas
+if not DATABASE_URL:
+    raise ValueError("No se encontró la variable de entorno DATABASE_URL. Asegúrate de que el archivo .env existe y tiene el formato correcto.")
 
 # 'create_engine' es el punto de entrada a la base de datos
 engine = create_engine(DATABASE_URL)
