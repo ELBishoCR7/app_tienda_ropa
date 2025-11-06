@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr, field_validator, validator
+from pydantic import BaseModel, EmailStr, field_validator
 from sqlalchemy.orm import Session # Para interactuar con la DB
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -30,13 +30,13 @@ class UserRegister(BaseModel):
     pais: str | None = None
     telefono: str | None = None
 
-    @validator("nombre_completo")
+    @field_validator("nombre_completo")
     def nombre_min_length(cls, v):
         if not v or len(v.strip()) < 2:
             raise ValueError("El nombre debe tener al menos 2 caracteres")
         return v.strip()
 
-    @validator("codigo_postal")
+    @field_validator("codigo_postal")
     def validar_codigo_postal(cls, v):
         if v is None:
             return v
@@ -45,7 +45,7 @@ class UserRegister(BaseModel):
             raise ValueError("Código postal inválido")
         return v.strip()
 
-    @validator("telefono")
+    @field_validator("telefono")
     def validar_telefono(cls, v):
         if v is None:
             return v
@@ -54,7 +54,7 @@ class UserRegister(BaseModel):
             raise ValueError("Teléfono inválido")
         return v.strip()
 
-    @validator("direccion", "ciudad", "estado", "pais")
+    @field_validator("direccion", "ciudad", "estado", "pais")
     def strip_strings(cls, v):
         if v is None:
             return v
@@ -145,7 +145,7 @@ class ProfileUpdateSchema(BaseModel):
     pais: str | None = None
     telefono: str | None = None
 
-    @validator("nombre_completo")
+    @field_validator("nombre_completo")
     def nombre_min_length(cls, v):
         if v is None:
             return v
@@ -153,7 +153,7 @@ class ProfileUpdateSchema(BaseModel):
             raise ValueError("El nombre debe tener al menos 2 caracteres")
         return v.strip()
 
-    @validator("codigo_postal")
+    @field_validator("codigo_postal")
     def validar_codigo_postal(cls, v):
         if v is None:
             return v
